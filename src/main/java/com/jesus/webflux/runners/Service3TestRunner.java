@@ -5,7 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 /**
  * A Spring Boot CommandLineRunner implementation that tests the interaction
@@ -38,13 +38,13 @@ public class Service3TestRunner implements CommandLineRunner {
         WebClient client = WebClient.create(SERVICE_3_URL);
 
         // Fetch a Product by its ID from the Service 3 API
-        Mono<Product> product = client.get()
-                .uri("/reactive/product/{id}") // Endpoint to fetch a product by ID
+        Flux<Product> product = client.get()
+                .uri("/reactive/product/all") // Endpoint to fetch a product by ID
                 .accept(MediaType.APPLICATION_JSON) // Specify that the response should be in JSON format
                 .retrieve() // Retrieve the response
-                .bodyToMono(Product.class); // Convert the response body to a Mono of Product
+                .bodyToFlux(Product.class); // Convert the response body to a Flux of Product
 
-        // Subscribe to the Mono and print the Product details to the console
+        // Subscribe to the Flux and print the Product details to the console
         product.subscribe(p -> System.out.println("Product: " + p));
     }
 }
