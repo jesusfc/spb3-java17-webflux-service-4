@@ -11,5 +11,6 @@ public record Product(
         String category,
         double unitPrice,
         int stock) {
+
 }
 
