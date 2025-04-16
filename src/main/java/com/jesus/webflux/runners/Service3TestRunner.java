@@ -2,6 +2,7 @@ package com.jesus.webflux.runners;
 
 import com.jesus.webflux.model.Product;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -35,7 +36,28 @@ public class Service3TestRunner implements CommandLineRunner {
 
         //service3TestGet();
         //service3TestPost();
-        service3TestGetById();
+        //service3TestGetById();
+        service3TestDeleteById();
+    }
+
+    private void service3TestDeleteById() {
+        System.out.println("Service3TestRunner - service3TestDeleteById()");
+
+        // Create a WebClient instance to interact with the Service 3 API
+        WebClient client = WebClient.create(SERVICE_3_URL);
+
+        // Fetch a Product by its ID from the Service 3 API
+        Mono<Product> product = client.delete()
+                .uri("/reactive/product/delete/101") // Endpoint to fetch a product by its ID
+                .accept(MediaType.APPLICATION_JSON) // Specify that the response should be in JSON format
+                .retrieve() // Retrieve the response
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+                    System.out.println("Error: " + clientResponse.statusCode());
+                    return Mono.empty();
+                }).bodyToMono(Product.class); // Convert the response body to a Mono of Product
+
+        // Subscribe to the Mono and print the Product details to the console
+        product.subscribe(p -> System.out.println("Product Eliminado!!!! "));
     }
 
     private void service3TestGetById() {
@@ -97,7 +119,7 @@ public class Service3TestRunner implements CommandLineRunner {
                 .retrieve() // Retrieve the response
                 .bodyToMono(Product.class);
 
-                // Subscribe to the Mono and print the created Product details to the console
-                productMono.subscribe(p -> System.out.println("Product created: " + p));
+        // Subscribe to the Mono and print the created Product details to the console
+        productMono.subscribe(p -> System.out.println("Product created: " + p));
     }
 }
